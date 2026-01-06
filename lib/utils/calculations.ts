@@ -116,11 +116,13 @@ export function generateInvoiceNumber(
   return `Invoice_${resourceName}_FY${fyYear}-${sequence}`;
 }
 
-export function formatCurrency(amount: number, currency: "USD" | "INR" = "USD"): string {
+export function formatCurrency(amount: number | string, currency: "USD" | "INR" = "USD"): string {
   const symbol = currency === "USD" ? "$" : "₹";
-  return `${symbol}${amount.toFixed(2)}`;
+  const numAmount = typeof amount === "string" ? parseFloat(amount) : amount;
+  return `${symbol}${numAmount.toFixed(2)}`;
 }
 
-export function formatHours(hours: number): string {
-  return hours.toFixed(2);
+export function formatHours(hours: number | string): string {
+  const numHours = typeof hours === "string" ? parseFloat(hours) : hours;
+  return numHours.toFixed(2);
 }
