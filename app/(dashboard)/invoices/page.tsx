@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -16,12 +17,24 @@ import { InvoicePreview } from "@/components/invoices/invoice-preview";
 import { useToast } from "@/hooks/use-toast";
 
 export default function InvoicesPage() {
+  const searchParams = useSearchParams();
   const [invoices, setInvoices] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [previewInvoice, setPreviewInvoice] = useState(null);
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const { toast } = useToast();
+
+  // Check if we should auto-open the form with date range from query params
+  useEffect(() => {
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
+
+    if (startDate && endDate) {
+      // Auto-open the invoice form when coming from timesheets
+      setIsFormOpen(true);
+    }
+  }, [searchParams]);
 
   const fetchInvoices = async () => {
     setIsLoading(true);
@@ -119,6 +132,8 @@ export default function InvoicesPage() {
         open={isFormOpen}
         onClose={() => setIsFormOpen(false)}
         onSuccess={handleSuccess}
+        initialStartDate={searchParams.get("startDate") || undefined}
+        initialEndDate={searchParams.get("endDate") || undefined}
       />
 
       {/* Invoice Preview Dialog */}

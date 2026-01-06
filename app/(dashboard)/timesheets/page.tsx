@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -9,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, RefreshCw, Filter } from "lucide-react";
+import { Plus, RefreshCw, Filter, FileText } from "lucide-react";
 import { TimesheetForm } from "@/components/timesheets/timesheet-form";
 import { TimesheetList } from "@/components/timesheets/timesheet-list";
 import { TimesheetSummary } from "@/components/timesheets/timesheet-summary";
@@ -24,6 +25,7 @@ export default function TimesheetsPage() {
   const [editingTimesheet, setEditingTimesheet] = useState(null);
   const [filterResource, setFilterResource] = useState<string>("all");
   const { toast } = useToast();
+  const router = useRouter();
 
   // Get current month range
   const currentMonth = getMonthRange();
@@ -103,6 +105,21 @@ export default function TimesheetsPage() {
     setEditingTimesheet(null);
   };
 
+  const handleCreateInvoice = () => {
+    // Check if there are timesheets in the current range
+    if (timesheets.length === 0) {
+      toast({
+        title: "No Timesheets",
+        description: "There are no timesheet entries in the selected date range to create an invoice.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Navigate to invoices page - the user can create invoice there with the date range
+    router.push(`/invoices?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -113,6 +130,10 @@ export default function TimesheetsPage() {
         <div className="flex gap-2">
           <Button variant="outline" size="icon" onClick={fetchTimesheets}>
             <RefreshCw className="h-4 w-4" />
+          </Button>
+          <Button variant="outline" onClick={handleCreateInvoice}>
+            <FileText className="mr-2 h-4 w-4" />
+            Create Invoice
           </Button>
           <Button onClick={() => setIsFormOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />

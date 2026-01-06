@@ -22,12 +22,24 @@ interface InvoiceFormProps {
   open: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  initialStartDate?: string;
+  initialEndDate?: string;
 }
 
-export function InvoiceForm({ open, onClose, onSuccess }: InvoiceFormProps) {
+export function InvoiceForm({ open, onClose, onSuccess, initialStartDate, initialEndDate }: InvoiceFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedResources, setSelectedResources] = useState<("Amit" | "Abhilash")[]>(["Amit", "Abhilash"]);
   const { toast } = useToast();
+
+  const getDefaultStartDate = () => {
+    if (initialStartDate) return new Date(initialStartDate);
+    return new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  };
+
+  const getDefaultEndDate = () => {
+    if (initialEndDate) return new Date(initialEndDate);
+    return new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
+  };
 
   const {
     register,
@@ -39,8 +51,8 @@ export function InvoiceForm({ open, onClose, onSuccess }: InvoiceFormProps) {
     resolver: zodResolver(invoiceSchema),
     defaultValues: {
       invoiceDate: new Date(),
-      billingPeriodStart: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-      billingPeriodEnd: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
+      billingPeriodStart: getDefaultStartDate(),
+      billingPeriodEnd: getDefaultEndDate(),
       clientName: "",
       clientAddress: "",
       resources: ["Amit", "Abhilash"],
