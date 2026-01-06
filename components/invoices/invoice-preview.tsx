@@ -176,20 +176,20 @@ export function InvoicePreview({ invoice, open, onClose }: InvoicePreviewProps) 
 
           {/* Totals */}
           <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <span className="font-medium">Subtotal (USD):</span>
-              <span className="text-lg">{formatCurrency(invoice.subtotalUsd, "USD")}</span>
-            </div>
-            <div className="flex justify-between items-center text-sm text-muted-foreground">
-              <span>Conversion Rate:</span>
-              <span>₹{Number(invoice.conversionRate).toFixed(2)} = $1.00</span>
-            </div>
             <Separator />
             <div className="flex justify-between items-center">
-              <span className="text-lg font-bold">Total (INR):</span>
-              <span className="text-2xl font-bold">
-                {formatCurrency(invoice.totalInr, "INR")}
+              <span className="text-lg font-bold">Invoice Total (USD):</span>
+              <span className="text-2xl font-bold text-primary">
+                {formatCurrency(invoice.subtotalUsd, "USD")}
               </span>
+            </div>
+            <Separator />
+            <div className="mt-4 p-3 bg-muted rounded-md">
+              <p className="text-xs text-muted-foreground mb-1">Reference Conversion (for information only):</p>
+              <div className="flex justify-between items-center text-sm">
+                <span>Conversion Rate: ₹{Number(invoice.conversionRate).toFixed(2)} = $1.00</span>
+                <span className="font-medium">≈ {formatCurrency(invoice.totalInr, "INR")}</span>
+              </div>
             </div>
           </div>
 

@@ -204,8 +204,7 @@ export function InvoiceList({ invoices, onView, onRefresh }: InvoiceListProps) {
                   <TableHead>Date</TableHead>
                   <TableHead>Client</TableHead>
                   <TableHead>Resources</TableHead>
-                  <TableHead>Amount (USD)</TableHead>
-                  <TableHead>Amount (INR)</TableHead>
+                  <TableHead className="text-right">Invoice Total</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -227,9 +226,9 @@ export function InvoiceList({ invoices, onView, onRefresh }: InvoiceListProps) {
                         ))}
                       </div>
                     </TableCell>
-                    <TableCell>{formatCurrency(invoice.subtotalUsd, "USD")}</TableCell>
-                    <TableCell className="font-medium">
-                      {formatCurrency(invoice.totalInr, "INR")}
+                    <TableCell className="text-right">
+                      <div className="font-medium text-primary">{formatCurrency(invoice.subtotalUsd, "USD")}</div>
+                      <div className="text-xs text-muted-foreground">≈ {formatCurrency(invoice.totalInr, "INR")}</div>
                     </TableCell>
                     <TableCell>{getStatusBadge(invoice.status)}</TableCell>
                     <TableCell className="text-right">

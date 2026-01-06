@@ -152,23 +152,32 @@ export async function POST(
           // Totals
           new Paragraph({
             children: [
-              new TextRun({ text: "\nSubtotal (USD): ", bold: true }),
-              new TextRun({ text: formatCurrency(invoice.subtotalUsd, "USD") }),
+              new TextRun({ text: "\n" }),
+            ],
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: "INVOICE TOTAL (USD): ", bold: true }),
+              new TextRun({ text: formatCurrency(invoice.subtotalUsd, "USD"), bold: true }),
             ],
             spacing: { before: 200 },
           }),
+          new Paragraph({ text: "" }),
           new Paragraph({
             children: [
-              new TextRun({ text: "Conversion Rate: ", bold: true }),
-              new TextRun({ text: `₹${Number(invoice.conversionRate).toFixed(2)} = $1` }),
+              new TextRun({ text: "Reference Conversion (for information only):", italics: true }),
+            ],
+            spacing: { before: 100 },
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: `Conversion Rate: ₹${Number(invoice.conversionRate).toFixed(2)} = $1.00` }),
             ],
           }),
           new Paragraph({
             children: [
-              new TextRun({ text: "Total (INR): ", bold: true, size: 24 }),
-              new TextRun({ text: formatCurrency(invoice.totalInr, "INR"), size: 24 }),
+              new TextRun({ text: `Approximate INR: ≈ ${formatCurrency(invoice.totalInr, "INR")}` }),
             ],
-            spacing: { before: 100 },
           }),
 
           // Footer

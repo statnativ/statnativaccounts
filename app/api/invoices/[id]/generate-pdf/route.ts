@@ -187,17 +187,16 @@ export async function POST(
 
           // Totals
           React.createElement(View, { style: styles.totals },
-            React.createElement(View, { style: styles.totalRow },
-              React.createElement(Text, { style: styles.totalLabel }, "Subtotal (USD):"),
+            React.createElement(View, { style: [styles.totalRow, styles.grandTotal] },
+              React.createElement(Text, { style: styles.totalLabel }, "INVOICE TOTAL (USD):"),
               React.createElement(Text, { style: styles.totalValue }, formatCurrency(invoice.subtotalUsd, "USD"))
             ),
-            React.createElement(View, { style: styles.totalRow },
-              React.createElement(Text, { style: styles.totalLabel }, "Conversion Rate:"),
-              React.createElement(Text, { style: styles.totalValue }, `₹${Number(invoice.conversionRate).toFixed(2)} = $1`)
-            ),
-            React.createElement(View, { style: [styles.totalRow, styles.grandTotal] },
-              React.createElement(Text, { style: styles.totalLabel }, "Total (INR):"),
-              React.createElement(Text, { style: styles.totalValue }, formatCurrency(invoice.totalInr, "INR"))
+            React.createElement(View, { style: { marginTop: 15, padding: 10, backgroundColor: '#f5f5f5', borderRadius: 4 } },
+              React.createElement(Text, { style: { fontSize: 9, color: '#666', marginBottom: 4 } }, "Reference Conversion (for information only):"),
+              React.createElement(View, { style: { flexDirection: 'row', justifyContent: 'space-between' } },
+                React.createElement(Text, { style: { fontSize: 10 } }, `Conversion Rate: ₹${Number(invoice.conversionRate).toFixed(2)} = $1.00`),
+                React.createElement(Text, { style: { fontSize: 10, fontWeight: 'bold' } }, `≈ ${formatCurrency(invoice.totalInr, "INR")}`)
+              )
             )
           ),
 
