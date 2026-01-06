@@ -2,12 +2,33 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "./schema";
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL is not set");
+// Check if DATABASE_URL is set
+const DATABASE_URL = process.env.DATABASE_URL;
+
+let db: ReturnType<typeof drizzle> | null = null;
+
+if (DATABASE_URL) {
+  try {
+    // Disable prefetch as it is not supported for "Transaction" pool mode
+    const client = postgres(DATABASE_URL, { prepare: false });
+    db = drizzle(client, { schema });
+  } catch (error) {
+    console.error("Failed to initialize database:", error);
+  }
 }
 
-const connectionString = process.env.DATABASE_URL;
+// Helper function to check if database is configured
+export function isDatabaseConfigured(): boolean {
+  return !!DATABASE_URL && !!db;
+}
 
-// Disable prefetch as it is not supported for "Transaction" pool mode
-const client = postgres(connectionString, { prepare: false });
-export const db = drizzle(client, { schema });
+// Helper function to get database or throw error
+export function getDatabase() {
+  if (!isDatabaseConfigured()) {
+    throw new Error("Database is not configured. Please set DATABASE_URL in your environment variables.");
+  }
+  return db!;
+}
+
+// Export db for backward compatibility (but prefer using getDatabase())
+export { db };

@@ -1,11 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db/drizzle";
+import { isDatabaseConfigured, getDatabase } from "@/lib/db/drizzle";
 import { timesheets } from "@/lib/db/schema";
 import { and, gte, lte, sql } from "drizzle-orm";
 
 // GET /api/timesheets/summary - Get summary statistics
 export async function GET(request: NextRequest) {
   try {
+    if (!isDatabaseConfigured()) {
+      return NextResponse.json(
+        {
+          error: "Database not configured",
+          message: "Please set up your database connection. See SETUP.md for instructions."
+        },
+        { status: 503 }
+      );
+    }
+
+    const db = getDatabase();
     const searchParams = request.nextUrl.searchParams;
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
@@ -46,10 +57,10 @@ export async function GET(request: NextRequest) {
         grandTotal,
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching timesheet summary:", error);
     return NextResponse.json(
-      { error: "Failed to fetch summary" },
+      { error: "Failed to fetch summary", message: error.message },
       { status: 500 }
     );
   }

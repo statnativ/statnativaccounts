@@ -1,12 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db/drizzle";
+import { isDatabaseConfigured, getDatabase } from "@/lib/db/drizzle";
 import { timesheets } from "@/lib/db/schema";
 import { timesheetSchema } from "@/lib/utils/validation";
-import { desc, eq, and, gte, lte, sql } from "drizzle-orm";
+import { desc, eq, and, gte, lte } from "drizzle-orm";
 
 // GET /api/timesheets - List timesheets with optional filters
 export async function GET(request: NextRequest) {
   try {
+    // Check if database is configured
+    if (!isDatabaseConfigured()) {
+      return NextResponse.json(
+        {
+          error: "Database not configured",
+          message: "Please set up your database connection. See SETUP.md for instructions."
+        },
+        { status: 503 }
+      );
+    }
+
+    const db = getDatabase();
     const searchParams = request.nextUrl.searchParams;
     const resourceName = searchParams.get("resourceName");
     const startDate = searchParams.get("startDate");
@@ -36,10 +48,10 @@ export async function GET(request: NextRequest) {
       .limit(limit);
 
     return NextResponse.json({ data: results, count: results.length });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching timesheets:", error);
     return NextResponse.json(
-      { error: "Failed to fetch timesheets" },
+      { error: "Failed to fetch timesheets", message: error.message },
       { status: 500 }
     );
   }
@@ -48,6 +60,18 @@ export async function GET(request: NextRequest) {
 // POST /api/timesheets - Create a new timesheet entry
 export async function POST(request: NextRequest) {
   try {
+    // Check if database is configured
+    if (!isDatabaseConfigured()) {
+      return NextResponse.json(
+        {
+          error: "Database not configured",
+          message: "Please set up your database connection. See SETUP.md for instructions."
+        },
+        { status: 503 }
+      );
+    }
+
+    const db = getDatabase();
     const body = await request.json();
 
     // Validate input
@@ -104,7 +128,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: "Failed to create timesheet entry" },
+      { error: "Failed to create timesheet entry", message: error.message },
       { status: 500 }
     );
   }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db/drizzle";
+import { isDatabaseConfigured, getDatabase } from "@/lib/db/drizzle";
 import { timesheets } from "@/lib/db/schema";
 import { timesheetSchema } from "@/lib/utils/validation";
 import { eq } from "drizzle-orm";
@@ -10,6 +10,17 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    if (!isDatabaseConfigured()) {
+      return NextResponse.json(
+        {
+          error: "Database not configured",
+          message: "Please set up your database connection. See SETUP.md for instructions."
+        },
+        { status: 503 }
+      );
+    }
+
+    const db = getDatabase();
     const [timesheet] = await db
       .select()
       .from(timesheets)
@@ -24,10 +35,10 @@ export async function GET(
     }
 
     return NextResponse.json({ data: timesheet });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching timesheet:", error);
     return NextResponse.json(
-      { error: "Failed to fetch timesheet entry" },
+      { error: "Failed to fetch timesheet entry", message: error.message },
       { status: 500 }
     );
   }
@@ -39,6 +50,17 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    if (!isDatabaseConfigured()) {
+      return NextResponse.json(
+        {
+          error: "Database not configured",
+          message: "Please set up your database connection. See SETUP.md for instructions."
+        },
+        { status: 503 }
+      );
+    }
+
+    const db = getDatabase();
     const body = await request.json();
 
     // Validate input
@@ -92,7 +114,7 @@ export async function PUT(
     }
 
     return NextResponse.json(
-      { error: "Failed to update timesheet entry" },
+      { error: "Failed to update timesheet entry", message: error.message },
       { status: 500 }
     );
   }
@@ -104,6 +126,18 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    if (!isDatabaseConfigured()) {
+      return NextResponse.json(
+        {
+          error: "Database not configured",
+          message: "Please set up your database connection. See SETUP.md for instructions."
+        },
+        { status: 503 }
+      );
+    }
+
+    const db = getDatabase();
+
     // Check if timesheet exists
     const [existing] = await db
       .select()
@@ -124,10 +158,10 @@ export async function DELETE(
     return NextResponse.json({
       message: "Timesheet entry deleted successfully",
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error deleting timesheet:", error);
     return NextResponse.json(
-      { error: "Failed to delete timesheet entry" },
+      { error: "Failed to delete timesheet entry", message: error.message },
       { status: 500 }
     );
   }
